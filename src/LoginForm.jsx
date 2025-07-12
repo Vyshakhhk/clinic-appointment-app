@@ -1,55 +1,96 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 function LoginForm({ onLogin }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    if (email === 'staff@clinic.com' && password === '123456') {
+    if (email === "staff@clinic.com" && password === "password") {
       onLogin();
     } else {
-      setError('Invalid email or password');
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-slate-800 mb-6">Clinic Staff Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] font-[Jost] px-4">
+      
+
+
+      <div className="relative w-full max-w-md h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/20">
+        <input
+          type="checkbox"
+          id="chk"
+          className="peer hidden"
+          checked={isSignUp}
+          onChange={() => setIsSignUp(!isSignUp)}
+        />
+
+        {/* Signup */}
+        <div className={`absolute inset-0 transition-transform duration-700 ${isSignUp ? "translate-y-0" : "-translate-y-full"} z-10`}>
+          <form className="h-full flex flex-col items-center justify-center px-8">
+            <label htmlFor="chk" className="text-3xl text-white font-bold mb-6 cursor-pointer">
+              Sign Up
+            </label>
+            <input type="text" placeholder="Username" className="input-style" />
+            <input type="email" placeholder="Email" className="input-style" />
+            <input type="password" placeholder="Password" className="input-style" />
+            <button type="button" className="btn-style bg-purple-600 hover:bg-purple-700 text-white">Sign Up</button>
+          </form>
+        </div>
+
+        {/* Login */}
+        <div className={`absolute inset-0 transition-transform duration-700 ${isSignUp ? "translate-y-full" : "translate-y-0"} z-20`}>
+          <form className="h-full flex flex-col items-center justify-center px-8" onSubmit={handleLogin}>
+          <label htmlFor="chk" className="text-2xl text-white font-semibold mb-6 cursor-pointer tracking-wide">
+            Clinic Staff Login
+          </label>
+
             <input
               type="email"
+              placeholder="Email"
+              className="input-style"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
             <input
               type="password"
+              placeholder="Password"
+              className="input-style"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            Login
-          </button>
-        </form>
+            <button type="submit" className="btn-style bg-purple-600 hover:bg-purple-700 text-white">Login</button>
+          </form>
+        </div>
       </div>
     </div>
   );
 }
+
+// Tailwind helper styles
+const style = document.createElement("style");
+style.innerHTML = `
+.input-style {
+  width: 60%;
+  padding: 12px;
+  margin: 12px 0;
+  border: none;
+  border-radius: 8px;
+  background-color: #e0dede;
+  outline: none;
+}
+.btn-style {
+  width: 60%;
+  padding: 10px;
+  margin-top: 24px;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: background 0.3s ease-in-out;
+}
+`;
+document.head.appendChild(style);
 
 export default LoginForm;
