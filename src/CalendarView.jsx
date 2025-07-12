@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-import dayjs from "dayjs";
 import { AnimatePresence, motion } from "framer-motion";
+import dayjs from "dayjs";
 
 function CalendarView() {
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-
-  const days = Array.from({ length: 7 }, (_, i) =>
-    dayjs().add(i, "day").format("MMMM D, YYYY")
-  );
+  const [days, setDays] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   const appointmentData = [
     { time: "10:00 AM", patient: "John Doe" },
@@ -19,6 +17,14 @@ function CalendarView() {
   const today = dayjs().format("MMMM D, YYYY");
 
   useEffect(() => {
+    // Generate 30 days from today
+    const nextDays = Array.from({ length: 30 }, (_, i) =>
+      dayjs().add(i, "day")
+    );
+    setDays(nextDays);
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
     };
@@ -26,12 +32,32 @@ function CalendarView() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleDateChange = (e) => {
+    const selected = dayjs(e.target.value);
+    const index = days.findIndex((d) => d.isSame(selected, "day"));
+    if (index !== -1) {
+      setCurrentDayIndex(index);
+      setSelectedDate(e.target.value);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white p-4">
-      
+      <h1 className="text-2xl md:text-3xl font-bold text-center text-slate-800 mb-6">
+        Appointments Calendar 📅
+      </h1>
+
       {isMobile ? (
-        // 📱 Mobile View with swipe gesture and animated arrow
-        <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center">
+        <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center space-y-4">
+          {/* 📅 Date Picker */}
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+            className="mb-4 px-4 py-2 rounded border text-sm shadow-sm w-full max-w-xs"
+          />
+
+          {/* 🗓️ Mobile Day View with Swipe */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentDayIndex}
@@ -40,8 +66,10 @@ function CalendarView() {
               onDragEnd={(event, info) => {
                 if (info.offset.y < -50 && currentDayIndex < days.length - 1) {
                   setCurrentDayIndex(currentDayIndex + 1);
+                  setSelectedDate(days[currentDayIndex + 1].format("YYYY-MM-DD"));
                 } else if (info.offset.y > 50 && currentDayIndex > 0) {
                   setCurrentDayIndex(currentDayIndex - 1);
+                  setSelectedDate(days[currentDayIndex - 1].format("YYYY-MM-DD"));
                 }
               }}
               initial={{ opacity: 0, y: 50 }}
@@ -52,12 +80,12 @@ function CalendarView() {
             >
               <p
                 className={`text-xl font-bold ${
-                  days[currentDayIndex] === today
+                  days[currentDayIndex].format("MMMM D, YYYY") === today
                     ? "text-green-700"
                     : "text-slate-800"
                 }`}
               >
-                {days[currentDayIndex]}
+                {days[currentDayIndex].format("MMMM D, YYYY")}
               </p>
 
               <div className="mt-4 space-y-2 text-left text-sm">
@@ -74,42 +102,25 @@ function CalendarView() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Animated bounce arrow as swipe hint */}
-          <div className="mt-6 flex flex-col items-center gap-1">
-            {[...Array(3)].map((_, i) => (
-                <motion.span
-                key={i}
-                className="w-2 h-2 bg-slate-400 rounded-full"
-                animate={{
-                    opacity: [0.3, 1, 0.3],
-                    scale: [1, 1.2, 1],
-                }}
-                transition={{
-                    duration: 1.2,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                }}
-                />
-            ))}
-          </div>
-
+          <p className="text-xs text-slate-500 mt-1">📆 Swipe or pick a date</p>
         </div>
       ) : (
-        //  Desktop View – full grid
+        // 💻 Desktop Grid View
         <div className="grid grid-cols-4 gap-4">
-          {days.map((day, i) => (
+          {days.slice(0, 7).map((day, i) => (
             <div
               key={i}
               className="bg-blue-100 p-4 rounded shadow text-left space-y-2"
             >
               <p
                 className={`font-semibold text-center ${
-                  day === today ? "text-green-700 underline" : "text-slate-800"
+                  day.format("MMMM D, YYYY") === today
+                    ? "text-green-700 underline"
+                    : "text-slate-800"
                 }`}
               >
-                {day}
+                {day.format("MMMM D, YYYY")}
               </p>
-
               <div className="mt-4 space-y-2 text-sm">
                 {appointmentData.map((appt, idx) => (
                   <div
