@@ -1,28 +1,18 @@
 import { useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import dayjs from "dayjs";
+import { AnimatePresence, motion } from "framer-motion";
+import AppointmentForm from "./AppointmentForm";
 
 function CalendarView() {
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  const [days, setDays] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [appointmentsByDay, setAppointmentsByDay] = useState({});
 
-  const appointmentData = [
-    { time: "10:00 AM", patient: "John Doe" },
-    { time: "11:30 AM", patient: "Jane Smith" },
-    { time: "2:00 PM", patient: "Dr. Strangelove" },
-  ];
+  const days = Array.from({ length: 7 }, (_, i) =>
+    dayjs().add(i, "day").format("MMMM D, YYYY")
+  );
 
   const today = dayjs().format("MMMM D, YYYY");
-
-  useEffect(() => {
-    // Generate 30 days from today
-    const nextDays = Array.from({ length: 30 }, (_, i) =>
-      dayjs().add(i, "day")
-    );
-    setDays(nextDays);
-  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,13 +22,12 @@ function CalendarView() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleDateChange = (e) => {
-    const selected = dayjs(e.target.value);
-    const index = days.findIndex((d) => d.isSame(selected, "day"));
-    if (index !== -1) {
-      setCurrentDayIndex(index);
-      setSelectedDate(e.target.value);
-    }
+  const handleSaveAppointment = (appointment) => {
+    const day = days[currentDayIndex];
+    setAppointmentsByDay((prev) => ({
+      ...prev,
+      [day]: [...(prev[day] || []), appointment],
+    }));
   };
 
   return (
@@ -48,16 +37,7 @@ function CalendarView() {
       </h1>
 
       {isMobile ? (
-        <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center space-y-4">
-          {/* 📅 Date Picker */}
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="mb-4 px-4 py-2 rounded border text-sm shadow-sm w-full max-w-xs"
-          />
-
-          {/* 🗓️ Mobile Day View with Swipe */}
+        <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center space-y-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentDayIndex}
@@ -65,11 +45,9 @@ function CalendarView() {
               dragConstraints={{ top: 0, bottom: 0 }}
               onDragEnd={(event, info) => {
                 if (info.offset.y < -50 && currentDayIndex < days.length - 1) {
-                  setCurrentDayIndex(currentDayIndex + 1);
-                  setSelectedDate(days[currentDayIndex + 1].format("YYYY-MM-DD"));
+                  setCurrentDayIndex((prev) => prev + 1);
                 } else if (info.offset.y > 50 && currentDayIndex > 0) {
-                  setCurrentDayIndex(currentDayIndex - 1);
-                  setSelectedDate(days[currentDayIndex - 1].format("YYYY-MM-DD"));
+                  setCurrentDayIndex((prev) => prev - 1);
                 }
               }}
               initial={{ opacity: 0, y: 50 }}
@@ -80,55 +58,57 @@ function CalendarView() {
             >
               <p
                 className={`text-xl font-bold ${
-                  days[currentDayIndex].format("MMMM D, YYYY") === today
+                  days[currentDayIndex] === today
                     ? "text-green-700"
                     : "text-slate-800"
                 }`}
               >
-                {days[currentDayIndex].format("MMMM D, YYYY")}
+                {days[currentDayIndex]}
               </p>
 
               <div className="mt-4 space-y-2 text-left text-sm">
-                {appointmentData.map((appt, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded p-2 shadow-sm border"
-                  >
-                    <p className="font-medium">{appt.time}</p>
-                    <p className="text-slate-600">Patient: {appt.patient}</p>
-                  </div>
-                ))}
+                {(appointmentsByDay[days[currentDayIndex]] || []).map(
+                  (appt, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white rounded p-2 shadow-sm border"
+                    >
+                      <p className="font-medium">{appt.time}</p>
+                      <p className="text-slate-600">Patient: {appt.patient}</p>
+                      <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                    </div>
+                  )
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
 
-          <p className="text-xs text-slate-500 mt-1">📆 Swipe or pick a date</p>
+          <AppointmentForm onSave={handleSaveAppointment} />
         </div>
       ) : (
-        // 💻 Desktop Grid View
         <div className="grid grid-cols-4 gap-4">
-          {days.slice(0, 7).map((day, i) => (
+          {days.map((day, i) => (
             <div
               key={i}
               className="bg-blue-100 p-4 rounded shadow text-left space-y-2"
             >
               <p
                 className={`font-semibold text-center ${
-                  day.format("MMMM D, YYYY") === today
-                    ? "text-green-700 underline"
-                    : "text-slate-800"
+                  day === today ? "text-green-700 underline" : "text-slate-800"
                 }`}
               >
-                {day.format("MMMM D, YYYY")}
+                {day}
               </p>
+
               <div className="mt-4 space-y-2 text-sm">
-                {appointmentData.map((appt, idx) => (
+                {(appointmentsByDay[day] || []).map((appt, idx) => (
                   <div
                     key={idx}
                     className="bg-white rounded p-2 shadow-sm border"
                   >
                     <p className="font-medium">{appt.time}</p>
                     <p className="text-slate-600">Patient: {appt.patient}</p>
+                    <p className="text-slate-600">Doctor: {appt.doctor}</p>
                   </div>
                 ))}
               </div>
