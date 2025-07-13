@@ -203,16 +203,21 @@ function CalendarView() {
               const isToday = formatted === today;
 
               return (
-                <div
-                  key={idx}
-                  onClick={() => {
-                    setSelectedDate(formatted);
-                    setShowModal(true);
-                  }}
-                  className={`rounded-xl p-2 border shadow-sm transition-all bg-white/70 hover:bg-blue-100/70 backdrop-blur-sm cursor-pointer
-                    ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
-                    ${isToday ? "border-blue-500" : "border-slate-200"} h-36 flex flex-col justify-between`}
-                >
+                <motion.div
+                    key={idx}
+                    onClick={() => {
+                      setSelectedDate(formatted);
+                      setShowModal(true);
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    layout
+                    className={`rounded-xl p-2 border shadow-sm bg-white/70 hover:bg-blue-100/70 backdrop-blur-sm cursor-pointer transition-all
+                      ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
+                      ${isToday ? "border-blue-500" : "border-slate-200"} h-36 flex flex-col justify-between`}
+                  >
+
+                
                   <div className="text-sm font-semibold text-slate-800 mb-1 text-right">
                     {date.date()}
                   </div>
@@ -228,35 +233,49 @@ function CalendarView() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
 
+         <AnimatePresence>
           {showModal && selectedDate && (
-            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-white text-black p-6 rounded-xl w-full max-w-md shadow-lg relative">
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setEditData(null);
-                  }}
-                  className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
+              <motion.div
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="bg-white text-black p-6 rounded-xl w-full max-w-md shadow-lg relative"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  ×
-                </button>
-                <h2 className="text-lg font-semibold mb-4">
-                  {editData ? "Edit" : "Add"} Appointment for {selectedDate}
-                </h2>
-                <AppointmentForm
-                  onSave={handleSaveAppointment}
-                  selectedDate={selectedDate}
-                  editData={editData}
-                  onCancelEdit={() => setEditData(null)}
-                />
-              </div>
-            </div>
-          )}
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditData(null);
+                    }}
+                    className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                  <h2 className="text-lg font-semibold mb-4">
+                    {editData ? "Edit" : "Add"} Appointment for {selectedDate}
+                  </h2>
+                  <AppointmentForm
+                    onSave={handleSaveAppointment}
+                    selectedDate={selectedDate}
+                    editData={editData}
+                    onCancelEdit={() => setEditData(null)}
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
         </>
       )}
     </div>
