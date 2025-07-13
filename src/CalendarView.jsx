@@ -25,7 +25,6 @@ function CalendarView() {
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
   const today = dayjs().format("YYYY-MM-DD");
 
   useEffect(() => {
@@ -34,12 +33,10 @@ function CalendarView() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Save to localStorage on every update
   useEffect(() => {
     localStorage.setItem("appointments", JSON.stringify(appointmentsByDay));
   }, [appointmentsByDay]);
 
-  // ✅ Load from localStorage on page load
   useEffect(() => {
     const stored = localStorage.getItem("appointments");
     if (stored) {
@@ -55,12 +52,10 @@ function CalendarView() {
 
     let date = startDate.clone();
     const calendar = [];
-
     while (date.isBefore(endDate, "day") || date.isSame(endDate, "day")) {
       calendar.push(date.clone());
       date = date.add(1, "day");
     }
-
     return calendar;
   };
 
@@ -68,12 +63,12 @@ function CalendarView() {
 
   const handleSaveAppointment = (appointment) => {
     const key = appointment.date
-      ? appointment.date // from desktop modal
-      : dayjs(days[currentDayIndex]).format("YYYY-MM-DD"); // from mobile date
+      ? appointment.date
+      : dayjs(days[currentDayIndex]).format("YYYY-MM-DD");
 
     const updatedAppointment = {
       ...appointment,
-      date: key, // ensure all saved appointments have `date`
+      date: key,
     };
 
     setAppointmentsByDay((prev) => ({
@@ -139,19 +134,14 @@ function CalendarView() {
                 {days[currentDayIndex]}
               </p>
 
-              <div className="mt-4 space-y-2 text-left text-sm">
-                {(appointmentsByDay[dayjs(days[currentDayIndex]).format("YYYY-MM-DD")] || []).map(
-                  (appt, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white rounded p-2 shadow-sm border"
-                    >
-                      <p className="font-medium">{appt.time}</p>
-                      <p className="text-slate-600">Patient: {appt.patient}</p>
-                      <p className="text-slate-600">Doctor: {appt.doctor}</p>
-                    </div>
-                  )
-                )}
+              <div className="mt-4 space-y-2 text-left text-sm overflow-y-auto max-h-40 pr-1 scrollbar-hide">
+                {(appointmentsByDay[dayjs(days[currentDayIndex]).format("YYYY-MM-DD")] || []).map((appt, idx) => (
+                  <div key={idx} className="bg-white rounded p-2 shadow-sm border">
+                    <p className="font-medium">{appt.time}</p>
+                    <p className="text-slate-600">Patient: {appt.patient}</p>
+                    <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -184,17 +174,18 @@ function CalendarView() {
                   }}
                   className={`rounded-xl p-2 border shadow-sm transition-all bg-white/70 hover:bg-blue-100/70 backdrop-blur-sm cursor-pointer
                     ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
-                    ${isToday ? "border-blue-500" : "border-slate-200"}`}
+                    ${isToday ? "border-blue-500" : "border-slate-200"}
+                    h-36 flex flex-col justify-between`}
                 >
                   <div className="text-sm font-semibold text-slate-800 mb-1 text-right">
                     {date.date()}
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1 overflow-y-auto pr-1 scrollbar-hide text-xs">
                     {(appointmentsByDay[formatted] || []).map((appt, i) => (
                       <div
                         key={i}
-                        className="text-xs bg-blue-500 text-white px-2 py-1 rounded"
+                        className="bg-blue-500 text-white px-2 py-1 rounded"
                       >
                         {appt.time} – {appt.patient}
                       </div>
