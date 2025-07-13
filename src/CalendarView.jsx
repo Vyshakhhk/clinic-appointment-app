@@ -12,7 +12,11 @@ function CalendarView() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
-  const [appointmentsByDay, setAppointmentsByDay] = useState({});
+  const [appointmentsByDay, setAppointmentsByDay] = useState(() => {
+  const stored = localStorage.getItem("appointments");
+  return stored ? JSON.parse(stored) : {};
+});
+
   const [days, setDays] = useState(() =>
     Array.from({ length: 7 }, (_, i) =>
       dayjs().add(i, "day").format("MMMM D, YYYY")
@@ -21,11 +25,25 @@ function CalendarView() {
 
   const today = dayjs().format("YYYY-MM-DD");
 
+  // Handle screen size change
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Load appointments from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("appointments");
+    if (stored) {
+      setAppointmentsByDay(JSON.parse(stored));
+    }
+  }, []);
+
+  // Save appointments to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("appointments", JSON.stringify(appointmentsByDay));
+  }, [appointmentsByDay]);
 
   const generateCalendar = () => {
     const startOfMonth = currentMonth.startOf("month");
@@ -53,6 +71,10 @@ function CalendarView() {
       [key]: [...(prev[key] || []), appointment],
     }));
   };
+    useEffect(() => {
+    localStorage.setItem("appointments", JSON.stringify(appointmentsByDay));
+  }, [appointmentsByDay]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-slate-100 to-white p-4">
@@ -81,12 +103,17 @@ function CalendarView() {
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               onDragEnd={(event, info) => {
-                if (info.offset.y < -50 && currentDayIndex < days.length - 1) {
+                if (info.offset.y < -50) {
+                  if (currentDayIndex === days.length - 1) {
+                    const nextDay = dayjs(days[days.length - 1]).add(1, "day").format("MMMM D, YYYY");
+                    setDays((prevDays) => [...prevDays, nextDay]);
+                  }
                   setCurrentDayIndex((prev) => prev + 1);
                 } else if (info.offset.y > 50 && currentDayIndex > 0) {
                   setCurrentDayIndex((prev) => prev - 1);
                 }
               }}
+
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
