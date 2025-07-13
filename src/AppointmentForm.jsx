@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-const patients = ["John Doe", "Jane Smith", "Alice Johnson"];
-const doctors = ["Dr. Kumar", "Dr. Patel", "Dr. Meera"];
+const patients = ["John Doe", "Jane Smith", "Alice Johnson", "Peter Parker"];
+const doctors = ["Dr. Kumar", "Dr. Strange", "Dr. Meera", "Dr. Wells"];
 
-const AppointmentForm = ({ onSave }) => {
+const AppointmentForm = ({ onSave, selectedDate }) => {
   const [patient, setPatient] = useState(patients[0]);
   const [doctor, setDoctor] = useState(doctors[0]);
   const [time, setTime] = useState("10:00");
@@ -12,8 +12,15 @@ const AppointmentForm = ({ onSave }) => {
     e.preventDefault();
     if (!patient || !doctor || !time) return;
 
-    onSave({ patient, doctor, time });
-    setTime("10:00"); // reset time
+    const appointment = {
+      patient,
+      doctor,
+      time,
+      ...(selectedDate && { date: selectedDate }) // Add date only if passed
+    };
+
+    onSave(appointment);
+    setTime("10:00");
   };
 
   return (
@@ -21,6 +28,19 @@ const AppointmentForm = ({ onSave }) => {
       onSubmit={handleSubmit}
       className="bg-white/10 backdrop-blur p-4 rounded-lg shadow-md space-y-4 w-full max-w-xs"
     >
+      {/* Conditionally show date (only on desktop) */}
+      {selectedDate && (
+        <div className="text-left text-sm">
+          <label className="block mb-1 font-medium">Date</label>
+          <input
+            type="text"
+            value={selectedDate}
+            readOnly
+            className="w-full p-2 rounded bg-white text-black font-semibold"
+          />
+        </div>
+      )}
+
       <div className="text-left text-sm">
         <label className="block mb-1 font-medium">Patient</label>
         <select
