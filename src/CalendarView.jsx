@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
@@ -17,6 +18,7 @@ function CalendarView() {
     return stored ? JSON.parse(stored) : {};
   });
 
+  const [editData, setEditData] = useState(null);
   const [days, setDays] = useState(() =>
     Array.from({ length: 7 }, (_, i) =>
       dayjs().add(i, "day").format("MMMM D, YYYY")
@@ -66,17 +68,41 @@ function CalendarView() {
       ? appointment.date
       : dayjs(days[currentDayIndex]).format("YYYY-MM-DD");
 
-    const updatedAppointment = {
-      ...appointment,
-      date: key,
-    };
-
-    setAppointmentsByDay((prev) => ({
-      ...prev,
-      [key]: [...(prev[key] || []), updatedAppointment],
-    }));
+    setAppointmentsByDay((prev) => {
+      const existing = [...(prev[key] || [])];
+      if (appointment.originalIndex !== undefined) {
+        existing[appointment.originalIndex] = appointment;
+      } else {
+        existing.push(appointment);
+      }
+      return {
+        ...prev,
+        [key]: existing,
+      };
+    });
 
     if (!isMobile) setShowModal(false);
+    setEditData(null);
+  };
+
+  const handleDeleteAppointment = (index, date) => {
+    setAppointmentsByDay((prev) => {
+      const updated = [...(prev[date] || [])];
+      updated.splice(index, 1);
+      return {
+        ...prev,
+        [date]: updated,
+      };
+    });
+  };
+
+  const handleEditAppointment = (index, date) => {
+    const appt = appointmentsByDay[date][index];
+    setEditData({ ...appt, originalIndex: index });
+    if (!isMobile) {
+      setSelectedDate(date);
+      setShowModal(true);
+    }
   };
 
   return (
@@ -136,17 +162,23 @@ function CalendarView() {
 
               <div className="mt-4 space-y-2 text-left text-sm overflow-y-auto max-h-40 pr-1 scrollbar-hide">
                 {(appointmentsByDay[dayjs(days[currentDayIndex]).format("YYYY-MM-DD")] || []).map((appt, idx) => (
-                  <div key={idx} className="bg-white rounded p-2 shadow-sm border">
-                    <p className="font-medium">{appt.time}</p>
-                    <p className="text-slate-600">Patient: {appt.patient}</p>
-                    <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                  <div key={idx} className="bg-white rounded p-2 shadow-sm border flex justify-between items-start gap-2">
+                    <div>
+                      <p className="font-medium">{appt.time}</p>
+                      <p className="text-slate-600">Patient: {appt.patient}</p>
+                      <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                    </div>
+                    <div className="space-x-1">
+                      <button onClick={() => handleEditAppointment(idx, dayjs(days[currentDayIndex]).format("YYYY-MM-DD"))} className="text-blue-500">✏️</button>
+                      <button onClick={() => handleDeleteAppointment(idx, dayjs(days[currentDayIndex]).format("YYYY-MM-DD"))} className="text-red-500">🗑️</button>
+                    </div>
                   </div>
                 ))}
               </div>
             </motion.div>
           </AnimatePresence>
 
-          <AppointmentForm onSave={handleSaveAppointment} />
+          <AppointmentForm onSave={handleSaveAppointment} editData={editData} onCancelEdit={() => setEditData(null)} />
         </div>
       ) : (
         <>
@@ -174,8 +206,7 @@ function CalendarView() {
                   }}
                   className={`rounded-xl p-2 border shadow-sm transition-all bg-white/70 hover:bg-blue-100/70 backdrop-blur-sm cursor-pointer
                     ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
-                    ${isToday ? "border-blue-500" : "border-slate-200"}
-                    h-36 flex flex-col justify-between`}
+                    ${isToday ? "border-blue-500" : "border-slate-200"} h-36 flex flex-col justify-between`}
                 >
                   <div className="text-sm font-semibold text-slate-800 mb-1 text-right">
                     {date.date()}
@@ -183,11 +214,12 @@ function CalendarView() {
 
                   <div className="space-y-1 overflow-y-auto pr-1 scrollbar-hide text-xs">
                     {(appointmentsByDay[formatted] || []).map((appt, i) => (
-                      <div
-                        key={i}
-                        className="bg-blue-500 text-white px-2 py-1 rounded"
-                      >
-                        {appt.time} – {appt.patient}
+                      <div key={i} className="bg-blue-500 text-white px-2 py-1 rounded flex justify-between items-center gap-1">
+                        <span>{appt.time} – {appt.patient}</span>
+                        <span>
+                          <button onClick={(e) => { e.stopPropagation(); handleEditAppointment(i, formatted); }} className="text-xs">✏️</button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDeleteAppointment(i, formatted); }} className="text-xs ml-1">🗑️</button>
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -196,22 +228,26 @@ function CalendarView() {
             })}
           </div>
 
-          {/* Desktop Modal Form */}
           {showModal && selectedDate && (
             <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-white text-black p-6 rounded-xl w-full max-w-md shadow-lg relative">
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditData(null);
+                  }}
                   className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
                 >
                   ×
                 </button>
                 <h2 className="text-lg font-semibold mb-4">
-                  Add Appointment for {selectedDate}
+                  {editData ? "Edit" : "Add"} Appointment for {selectedDate}
                 </h2>
                 <AppointmentForm
                   onSave={handleSaveAppointment}
                   selectedDate={selectedDate}
+                  editData={editData}
+                  onCancelEdit={() => setEditData(null)}
                 />
               </div>
             </div>

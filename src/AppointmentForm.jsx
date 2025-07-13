@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const patients = ["John Doe", "Jane Smith", "Alice Johnson", "Peter Parker"];
 const doctors = ["Dr. Kumar", "Dr. Strange", "Dr. Meera", "Dr. Wells"];
 
-const AppointmentForm = ({ onSave, selectedDate }) => {
+const AppointmentForm = ({ onSave, selectedDate, editData, onCancelEdit }) => {
   const [patient, setPatient] = useState(patients[0]);
   const [doctor, setDoctor] = useState(doctors[0]);
   const [time, setTime] = useState("10:00");
+
+  useEffect(() => {
+    if (editData) {
+      setPatient(editData.patient);
+      setDoctor(editData.doctor);
+      setTime(editData.time);
+    }
+  }, [editData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,11 +24,13 @@ const AppointmentForm = ({ onSave, selectedDate }) => {
       patient,
       doctor,
       time,
-      ...(selectedDate && { date: selectedDate }) // Add date only if passed
+      ...(selectedDate && { date: selectedDate }),
+      ...(editData?.originalIndex !== undefined && { originalIndex: editData.originalIndex }),
     };
 
     onSave(appointment);
     setTime("10:00");
+    if (onCancelEdit) onCancelEdit(); // close edit mode
   };
 
   return (
@@ -28,7 +38,6 @@ const AppointmentForm = ({ onSave, selectedDate }) => {
       onSubmit={handleSubmit}
       className="bg-white/10 backdrop-blur p-4 rounded-lg shadow-md space-y-4 w-full max-w-xs"
     >
-      {/* Conditionally show date (only on desktop) */}
       {selectedDate && (
         <div className="text-left text-sm">
           <label className="block mb-1 font-medium">Date</label>
@@ -81,12 +90,23 @@ const AppointmentForm = ({ onSave, selectedDate }) => {
         />
       </div>
 
-      <button
-        type="submit"
-        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded"
-      >
-        Save Appointment
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded"
+        >
+          {editData ? "Update" : "Save"} Appointment
+        </button>
+        {editData && (
+          <button
+            type="button"
+            onClick={onCancelEdit}
+            className="flex-1 bg-gray-300 hover:bg-gray-400 text-black font-semibold py-2 rounded"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 };
