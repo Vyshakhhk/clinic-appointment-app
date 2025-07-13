@@ -5,6 +5,8 @@ import weekday from "dayjs/plugin/weekday";
 import isoWeek from "dayjs/plugin/isoWeek";
 import { AnimatePresence, motion } from "framer-motion";
 import AppointmentForm from "./AppointmentForm";
+import toast from "react-hot-toast";
+
 
 dayjs.extend(weekday);
 dayjs.extend(isoWeek);
@@ -62,39 +64,42 @@ function CalendarView() {
   };
 
   const calendarDates = generateCalendar();
-
-  const handleSaveAppointment = (appointment) => {
+    const handleSaveAppointment = (appointment) => {
     const key = appointment.date
       ? appointment.date
       : dayjs(days[currentDayIndex]).format("YYYY-MM-DD");
 
-    setAppointmentsByDay((prev) => {
-      const existing = [...(prev[key] || [])];
-      if (appointment.originalIndex !== undefined) {
-        existing[appointment.originalIndex] = appointment;
-      } else {
-        existing.push(appointment);
-      }
-      return {
-        ...prev,
-        [key]: existing,
-      };
-    });
+    const updatedAppointments = { ...appointmentsByDay };
+    const existing = [...(appointmentsByDay[key] || [])];
+
+    if (appointment.originalIndex !== undefined) {
+      existing[appointment.originalIndex] = appointment;
+      toast.success("Appointment updated!");
+    } else {
+      existing.push(appointment);
+      toast.success("Appointment added!");
+    }
+
+    updatedAppointments[key] = existing;
+    setAppointmentsByDay(updatedAppointments);
 
     if (!isMobile) setShowModal(false);
     setEditData(null);
   };
 
   const handleDeleteAppointment = (index, date) => {
-    setAppointmentsByDay((prev) => {
-      const updated = [...(prev[date] || [])];
-      updated.splice(index, 1);
-      return {
-        ...prev,
-        [date]: updated,
-      };
-    });
+  const updated = [...(appointmentsByDay[date] || [])];
+  updated.splice(index, 1);
+
+  setAppointmentsByDay((prev) => ({
+    ...prev,
+    [date]: updated,
+  }));
+
+  toast.success("Appointment deleted!");
   };
+
+
 
   const handleEditAppointment = (index, date) => {
     const appt = appointmentsByDay[date][index];
