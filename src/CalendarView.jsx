@@ -16,13 +16,13 @@ function CalendarView() {
     const stored = localStorage.getItem("appointments");
     return stored ? JSON.parse(stored) : {};
   });
+
   const [days, setDays] = useState(() =>
     Array.from({ length: 7 }, (_, i) =>
       dayjs().add(i, "day").format("MMMM D, YYYY")
     )
   );
 
-  // Desktop modal logic
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -34,16 +34,18 @@ function CalendarView() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // ✅ Save to localStorage on every update
+  useEffect(() => {
+    localStorage.setItem("appointments", JSON.stringify(appointmentsByDay));
+  }, [appointmentsByDay]);
+
+  // ✅ Load from localStorage on page load
   useEffect(() => {
     const stored = localStorage.getItem("appointments");
     if (stored) {
       setAppointmentsByDay(JSON.parse(stored));
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("appointments", JSON.stringify(appointmentsByDay));
-  }, [appointmentsByDay]);
 
   const generateCalendar = () => {
     const startOfMonth = currentMonth.startOf("month");
@@ -54,7 +56,7 @@ function CalendarView() {
     let date = startDate.clone();
     const calendar = [];
 
-    while (date.isBefore(endDate, "day")) {
+    while (date.isBefore(endDate, "day") || date.isSame(endDate, "day")) {
       calendar.push(date.clone());
       date = date.add(1, "day");
     }
@@ -65,15 +67,21 @@ function CalendarView() {
   const calendarDates = generateCalendar();
 
   const handleSaveAppointment = (appointment) => {
-    const key = isMobile
-      ? days[currentDayIndex]
-      : dayjs(appointment.date).format("YYYY-MM-DD");
+    const key = appointment.date
+      ? appointment.date // from desktop modal
+      : dayjs(days[currentDayIndex]).format("YYYY-MM-DD"); // from mobile date
+
+    const updatedAppointment = {
+      ...appointment,
+      date: key, // ensure all saved appointments have `date`
+    };
 
     setAppointmentsByDay((prev) => ({
       ...prev,
-      [key]: [...(prev[key] || []), appointment],
+      [key]: [...(prev[key] || []), updatedAppointment],
     }));
-    setShowModal(false); // Close modal after saving
+
+    if (!isMobile) setShowModal(false);
   };
 
   return (
@@ -132,16 +140,18 @@ function CalendarView() {
               </p>
 
               <div className="mt-4 space-y-2 text-left text-sm">
-                {(appointmentsByDay[days[currentDayIndex]] || []).map((appt, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded p-2 shadow-sm border"
-                  >
-                    <p className="font-medium">{appt.time}</p>
-                    <p className="text-slate-600">Patient: {appt.patient}</p>
-                    <p className="text-slate-600">Doctor: {appt.doctor}</p>
-                  </div>
-                ))}
+                {(appointmentsByDay[dayjs(days[currentDayIndex]).format("YYYY-MM-DD")] || []).map(
+                  (appt, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white rounded p-2 shadow-sm border"
+                    >
+                      <p className="font-medium">{appt.time}</p>
+                      <p className="text-slate-600">Patient: {appt.patient}</p>
+                      <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                    </div>
+                  )
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -208,7 +218,10 @@ function CalendarView() {
                 <h2 className="text-lg font-semibold mb-4">
                   Add Appointment for {selectedDate}
                 </h2>
-                <AppointmentForm onSave={handleSaveAppointment} date={selectedDate} />
+                <AppointmentForm
+                  onSave={handleSaveAppointment}
+                  selectedDate={selectedDate}
+                />
               </div>
             </div>
           )}
