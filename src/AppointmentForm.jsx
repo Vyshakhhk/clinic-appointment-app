@@ -1,78 +1,74 @@
 import { useState } from "react";
 
-function AppointmentForm({ onSave }) {
-  const [patient, setPatient] = useState("");
-  const [doctor, setDoctor] = useState("");
-  const [time, setTime] = useState("");
+const patients = ["John Doe", "Jane Smith", "Alice Johnson"];
+const doctors = ["Dr. Kumar", "Dr. Patel", "Dr. Meera"];
+
+const AppointmentForm = ({ onSave }) => {
+  const [patient, setPatient] = useState(patients[0]);
+  const [doctor, setDoctor] = useState(doctors[0]);
+  const [time, setTime] = useState("10:00");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!patient || !doctor || !time) {
-      alert("Please fill all fields");
-      return;
-    }
+    if (!patient || !doctor || !time) return;
 
     onSave({ patient, doctor, time });
-
-    // Clear form after save
-    setPatient("");
-    setDoctor("");
-    setTime("");
+    setTime("10:00"); // reset time
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-4 rounded shadow-md space-y-4 w-full max-w-md mx-auto"
+      className="bg-white/10 backdrop-blur p-4 rounded-lg shadow-md space-y-4 w-full max-w-xs"
     >
-      <h2 className="text-lg font-semibold text-slate-800 text-center">Add Appointment</h2>
-
-      <div className="flex flex-col">
-        <label className="text-sm text-slate-700 mb-1">Patient</label>
+      <div className="text-left text-sm">
+        <label className="block mb-1 font-medium">Patient</label>
         <select
           value={patient}
           onChange={(e) => setPatient(e.target.value)}
-          className="border rounded px-3 py-2"
+          className="w-full p-2 rounded bg-white text-black"
         >
-          <option value="">Select patient</option>
-          <option value="John Doe">John Doe</option>
-          <option value="Jane Smith">Jane Smith</option>
-          <option value="Alice Cooper">Alice Cooper</option>
+          {patients.map((p, idx) => (
+            <option key={idx} value={p}>
+              {p}
+            </option>
+          ))}
         </select>
       </div>
 
-      <div className="flex flex-col">
-        <label className="text-sm text-slate-700 mb-1">Doctor</label>
+      <div className="text-left text-sm">
+        <label className="block mb-1 font-medium">Doctor</label>
         <select
           value={doctor}
           onChange={(e) => setDoctor(e.target.value)}
-          className="border rounded px-3 py-2"
+          className="w-full p-2 rounded bg-white text-black"
         >
-          <option value="">Select doctor</option>
-          <option value="Dr. House">Dr. House</option>
-          <option value="Dr. Watson">Dr. Watson</option>
-          <option value="Dr. Strange">Dr. Strange</option>
+          {doctors.map((d, idx) => (
+            <option key={idx} value={d}>
+              {d}
+            </option>
+          ))}
         </select>
       </div>
 
-      <div className="flex flex-col">
-        <label className="text-sm text-slate-700 mb-1">Time</label>
+      <div className="text-left text-sm">
+        <label className="block mb-1 font-medium">Time</label>
         <input
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="border rounded px-3 py-2"
+          className="w-full p-2 rounded bg-white text-black"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded"
+        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded"
       >
         Save Appointment
       </button>
     </form>
   );
-}
+};
 
 export default AppointmentForm;

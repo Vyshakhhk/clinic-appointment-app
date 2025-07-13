@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import LoginForm from './LoginForm';
 import CalendarView from './CalendarView';
-import CalendarGrid from './components/CalendarGrid'; // ✅ Import our desktop grid
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,12 +30,8 @@ function App() {
             </button>
           </nav>
 
-          {/* 📅 Calendar Body (You can choose which to render or both) */}
-          {/* For now, show CalendarGrid (desktop) */}
-          <CalendarGrid />
-
-          {/* Later you can switch based on screen size using media queries or hooks */}
-          {/* <CalendarView /> */}
+          
+          <CalendarView />
         </>
       ) : (
         <LoginForm onLogin={() => setIsLoggedIn(true)} />

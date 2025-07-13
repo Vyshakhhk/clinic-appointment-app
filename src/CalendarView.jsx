@@ -13,13 +13,13 @@ function CalendarView() {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [appointmentsByDay, setAppointmentsByDay] = useState({});
+  const [days, setDays] = useState(() =>
+    Array.from({ length: 7 }, (_, i) =>
+      dayjs().add(i, "day").format("MMMM D, YYYY")
+    )
+  );
 
   const today = dayjs().format("YYYY-MM-DD");
-  const currentMonthStr = currentMonth.format("MMMM YYYY");
-
-  const days = Array.from({ length: 7 }, (_, i) =>
-    dayjs().add(i, "day").format("MMMM D, YYYY")
-  );
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -56,10 +56,25 @@ function CalendarView() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-slate-100 to-white p-4">
-
-      {/*  Mobile View */}
       {isMobile ? (
         <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center space-y-6">
+          <input
+            type="date"
+            value={dayjs(days[currentDayIndex]).format("YYYY-MM-DD")}
+            onChange={(e) => {
+              const selectedFormatted = dayjs(e.target.value).format("MMMM D, YYYY");
+              const foundIndex = days.findIndex((d) => d === selectedFormatted);
+              if (foundIndex !== -1) {
+                setCurrentDayIndex(foundIndex);
+              } else {
+                const updatedDays = [...days, selectedFormatted];
+                setDays(updatedDays);
+                setCurrentDayIndex(updatedDays.length - 1);
+              }
+            }}
+            className="w-full max-w-xs mb-2 p-2 rounded-md bg-white text-black shadow"
+          />
+
           <AnimatePresence mode="wait">
             <motion.div
               key={currentDayIndex}
@@ -80,7 +95,7 @@ function CalendarView() {
             >
               <p
                 className={`text-xl font-bold ${
-                  days[currentDayIndex] === today
+                  days[currentDayIndex] === dayjs().format("MMMM D, YYYY")
                     ? "text-green-700"
                     : "text-slate-800"
                 }`}
@@ -89,18 +104,16 @@ function CalendarView() {
               </p>
 
               <div className="mt-4 space-y-2 text-left text-sm">
-                {(appointmentsByDay[days[currentDayIndex]] || []).map(
-                  (appt, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white rounded p-2 shadow-sm border"
-                    >
-                      <p className="font-medium">{appt.time}</p>
-                      <p className="text-slate-600">Patient: {appt.patient}</p>
-                      <p className="text-slate-600">Doctor: {appt.doctor}</p>
-                    </div>
-                  )
-                )}
+                {(appointmentsByDay[days[currentDayIndex]] || []).map((appt, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white rounded p-2 shadow-sm border"
+                  >
+                    <p className="font-medium">{appt.time}</p>
+                    <p className="text-slate-600">Patient: {appt.patient}</p>
+                    <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -108,9 +121,7 @@ function CalendarView() {
           <AppointmentForm onSave={handleSaveAppointment} />
         </div>
       ) : (
-        //  Desktop View
         <div className="grid grid-cols-7 gap-4">
-          {/* Weekday Headers */}
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div
               key={day}
@@ -120,7 +131,6 @@ function CalendarView() {
             </div>
           ))}
 
-          {/* Calendar Grid */}
           {calendarDates.map((date, idx) => {
             const formatted = date.format("YYYY-MM-DD");
             const isCurrentMonth = date.month() === currentMonth.month();
