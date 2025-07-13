@@ -1,41 +1,63 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import weekday from "dayjs/plugin/weekday";
+import isoWeek from "dayjs/plugin/isoWeek";
 import { AnimatePresence, motion } from "framer-motion";
 import AppointmentForm from "./AppointmentForm";
 
+dayjs.extend(weekday);
+dayjs.extend(isoWeek);
+
 function CalendarView() {
-  const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const [currentMonth, setCurrentMonth] = useState(dayjs());
+  const [currentDayIndex, setCurrentDayIndex] = useState(0);
   const [appointmentsByDay, setAppointmentsByDay] = useState({});
+
+  const today = dayjs().format("YYYY-MM-DD");
+  const currentMonthStr = currentMonth.format("MMMM YYYY");
 
   const days = Array.from({ length: 7 }, (_, i) =>
     dayjs().add(i, "day").format("MMMM D, YYYY")
   );
 
-  const today = dayjs().format("MMMM D, YYYY");
-
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const generateCalendar = () => {
+    const startOfMonth = currentMonth.startOf("month");
+    const endOfMonth = currentMonth.endOf("month");
+    const startDate = startOfMonth.startOf("week");
+    const endDate = endOfMonth.endOf("week");
+
+    let date = startDate.clone();
+    const calendar = [];
+
+    while (date.isBefore(endDate, "day")) {
+      calendar.push(date.clone());
+      date = date.add(1, "day");
+    }
+
+    return calendar;
+  };
+
+  const calendarDates = generateCalendar();
+
   const handleSaveAppointment = (appointment) => {
-    const day = days[currentDayIndex];
+    const key = isMobile ? days[currentDayIndex] : appointment.date;
     setAppointmentsByDay((prev) => ({
       ...prev,
-      [day]: [...(prev[day] || []), appointment],
+      [key]: [...(prev[key] || []), appointment],
     }));
   };
 
   return (
-    <div className="min-h-screen bg-white p-4">
-      <h1 className="text-2xl md:text-3xl font-bold text-center text-slate-800 mb-6">
-        Appointments Calendar 📅
-      </h1>
+    <div className="min-h-screen bg-gradient-to-br from-white via-slate-100 to-white p-4">
 
+      {/*  Mobile View */}
       {isMobile ? (
         <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center space-y-6">
           <AnimatePresence mode="wait">
@@ -86,34 +108,48 @@ function CalendarView() {
           <AppointmentForm onSave={handleSaveAppointment} />
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-4">
-          {days.map((day, i) => (
+        //  Desktop View
+        <div className="grid grid-cols-7 gap-4">
+          {/* Weekday Headers */}
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div
-              key={i}
-              className="bg-blue-100 p-4 rounded shadow text-left space-y-2"
+              key={day}
+              className="text-center text-slate-500 font-semibold uppercase tracking-wider"
             >
-              <p
-                className={`font-semibold text-center ${
-                  day === today ? "text-green-700 underline" : "text-slate-800"
-                }`}
-              >
-                {day}
-              </p>
-
-              <div className="mt-4 space-y-2 text-sm">
-                {(appointmentsByDay[day] || []).map((appt, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded p-2 shadow-sm border"
-                  >
-                    <p className="font-medium">{appt.time}</p>
-                    <p className="text-slate-600">Patient: {appt.patient}</p>
-                    <p className="text-slate-600">Doctor: {appt.doctor}</p>
-                  </div>
-                ))}
-              </div>
+              {day}
             </div>
           ))}
+
+          {/* Calendar Grid */}
+          {calendarDates.map((date, idx) => {
+            const formatted = date.format("YYYY-MM-DD");
+            const isCurrentMonth = date.month() === currentMonth.month();
+            const isToday = formatted === today;
+
+            return (
+              <div
+                key={idx}
+                className={`rounded-xl p-2 border shadow-sm transition-all bg-white/70 hover:bg-blue-100/70 backdrop-blur-sm 
+                  ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""} 
+                  ${isToday ? "border-blue-500" : "border-slate-200"}`}
+              >
+                <div className="text-sm font-semibold text-slate-800 mb-1 text-right">
+                  {date.date()}
+                </div>
+
+                <div className="space-y-1">
+                  {(appointmentsByDay[formatted] || []).map((appt, i) => (
+                    <div
+                      key={i}
+                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded"
+                    >
+                      {appt.time} – {appt.patient}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
