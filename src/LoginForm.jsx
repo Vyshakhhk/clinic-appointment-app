@@ -18,18 +18,16 @@ function LoginForm({ onLogin }) {
   return (
     
   <div
-    className="w-full flex items-center justify-center font-[Jost] px-4"
+    className="w-screen h-screen flex items-center justify-center font-[Jost] px-4"
     style={{
-    minHeight: "100dvh",
     backgroundImage: "url('/images/clinic-login-bg.webp')",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
     backgroundAttachment: "fixed",
   }}
+>
 
-
-    >
       <div className="relative w-full max-w-md h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/20">
         <input
           type="checkbox"
