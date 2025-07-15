@@ -16,16 +16,19 @@ function LoginForm({ onLogin }) {
   };
 
   return (
-    <div
-      className="min-h-[100dvh] flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat font-[Jost] px-4"
-      style={{
-        backgroundImage:  "url('/images/clinic-login-bg.webp')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment:"fixed",
-        backgroundSize: "contain",
-      }}
+    
+  <div
+    className="w-full flex items-center justify-center font-[Jost] px-4"
+    style={{
+    minHeight: "100dvh",
+    backgroundImage: "url('/images/clinic-login-bg.webp')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundAttachment: "fixed",
+  }}
+
+
     >
       <div className="relative w-full max-w-md h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/20">
         <input
