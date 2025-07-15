@@ -1,34 +1,32 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Calendar from "react-calendar";
 import dayjs from "dayjs";
-import weekday from "dayjs/plugin/weekday";
-import isoWeek from "dayjs/plugin/isoWeek";
 import AppointmentForm from "./AppointmentForm";
-import Modal from "./Modal"; // Optional: separate modal component
-
-dayjs.extend(weekday);
-dayjs.extend(isoWeek);
+import Modal from "./Modal";
 
 const CalendarGrid = () => {
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [appointments, setAppointments] = useState({});
-  const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const today = dayjs().format("YYYY-MM-DD");
+  const formatDate = (date) => dayjs(date).format("YYYY-MM-DD");
 
   useEffect(() => {
     const stored = localStorage.getItem("appointments");
-    if (stored) {
-      setAppointments(JSON.parse(stored));
-    }
+    if (stored) setAppointments(JSON.parse(stored));
   }, []);
 
   useEffect(() => {
     localStorage.setItem("appointments", JSON.stringify(appointments));
   }, [appointments]);
 
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    setShowModal(true);
+  };
+
   const handleSaveAppointment = (appointment) => {
-    const key = appointment.date;
+    const key = formatDate(appointment.date);
     setAppointments((prev) => ({
       ...prev,
       [key]: [...(prev[key] || []), appointment],
@@ -36,98 +34,64 @@ const CalendarGrid = () => {
     setShowModal(false);
   };
 
-  const generateCalendar = () => {
-    const startOfMonth = currentMonth.startOf("month");
-    const endOfMonth = currentMonth.endOf("month");
-    const startDate = startOfMonth.startOf("week");
-    const endDate = endOfMonth.endOf("week");
-
-    let date = startDate.clone();
-    const calendar = [];
-
-    while (date.isBefore(endDate, "day") || date.isSame(endDate, "day")) {
-      calendar.push(date.clone());
-      date = date.add(1, "day");
-    }
-
-    return calendar;
-  };
-
-  const calendarDates = generateCalendar();
-
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      {/* Month & Navigation */}
-      <div className="flex justify-between items-center mb-4 text-white">
-        <button
-          onClick={() => setCurrentMonth((prev) => prev.subtract(1, "month"))}
-          className="px-3 py-1 rounded bg-white/10 hover:bg-white/20"
-        >
-          Prev
-        </button>
-        <h2 className="text-xl font-semibold">
-          {currentMonth.format("MMMM YYYY")}
-        </h2>
-        <button
-          onClick={() => setCurrentMonth((prev) => prev.add(1, "month"))}
-          className="px-3 py-1 rounded bg-white/10 hover:bg-white/20"
-        >
-          Next
-        </button>
-      </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      {/* Always white text regardless of dark mode */}
+      <h2 className="text-2xl font-bold mb-4 text-gray-900">
+        Clinic Appointment Calendar
+      </h2>
 
-      {/* Weekdays Header */}
-      <div className="grid grid-cols-7 gap-2 text-center font-semibold text-gray-300 mb-2">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day}>{day}</div>
-        ))}
-      </div>
+      <div className="calendar-wrapper">
+        <Calendar
+          onChange={handleDateClick}
+          value={selectedDate}
+          tileClassName={({ date, view }) => {
+            if (view !== "month") return "";
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
-        {calendarDates.map((date, idx) => {
-          const formatted = date.format("YYYY-MM-DD");
-          const isCurrentMonth = date.month() === currentMonth.month();
-          const isToday = formatted === today;
+            const isToday = formatDate(date) === formatDate(new Date());
+            const isSelected =
+              formatDate(date) === formatDate(selectedDate);
 
-          return (
-            <div
-              key={idx}
-              onClick={() => {
-                setSelectedDate(formatted);
-                setShowModal(true);
-              }}
-              className={`rounded-xl p-2 border shadow-sm transition-all backdrop-blur-sm cursor-pointer
-                ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
-                ${isToday ? "border-blue-500 bg-blue-100/30" : "border-white/20 bg-white/10"}
-                hover:bg-blue-200/20`}
-            >
-              <div className="text-sm font-semibold text-white mb-1 text-right">
-                {date.date()}
-              </div>
+            let classes = `
+              text-sm p-2 rounded-lg text-center transition-colors duration-200
+              bg-white text-gray-900 hover:bg-gray-100 border border-gray-300
+            `;
 
-              <div className="space-y-1 text-left text-xs text-white">
-                {(appointments[formatted] || []).map((appt, i) => (
+            if (isToday) {
+              classes += " border-purple-400 font-semibold";
+            }
+            if (isSelected) {
+              classes += " border-2 border-purple-500 font-semibold";
+            }
+
+            return classes;
+          }}
+          tileContent={({ date }) => {
+            const key = formatDate(date);
+            const dayAppointments = appointments[key] || [];
+            return (
+              <div className="mt-1 space-y-0.5 text-[10px] text-gray-900">
+                {dayAppointments.map((appt, i) => (
                   <div
                     key={i}
-                    className="bg-blue-500 text-white px-2 py-1 rounded"
+                    className="bg-[#9333ea] text-white rounded px-1 py-0.5 truncate"
                   >
                     {appt.time} – {appt.patient}
                   </div>
                 ))}
               </div>
-            </div>
-          );
-        })}
+            );
+          }}
+          className="rounded-lg shadow-xl p-2 bg-white/10 backdrop-blur-md text-sm"
+        />
       </div>
 
-      {/* Appointment Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-sm">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-700">
-                Book Appointment for {selectedDate}
+                Book Appointment for {formatDate(selectedDate)}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -136,7 +100,6 @@ const CalendarGrid = () => {
                 ×
               </button>
             </div>
-
             <AppointmentForm
               onSave={handleSaveAppointment}
               selectedDate={selectedDate}

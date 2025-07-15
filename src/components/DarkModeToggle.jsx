@@ -2,27 +2,29 @@
 import { useEffect, useState } from "react";
 
 function DarkModeToggle() {
-  const [dark, setDark] = useState(() =>
-    localStorage.getItem("theme") === "dark"
+  const [isDark, setIsDark] = useState(
+    localStorage.theme === "dark" ||
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
   );
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (dark) {
+    const root = document.documentElement;
+    if (isDark) {
       root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
+      localStorage.theme = "dark";
     } else {
       root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
+      localStorage.theme = "light";
     }
-  }, [dark]);
+  }, [isDark]);
 
   return (
     <button
-      onClick={() => setDark(!dark)}
-      className="text-sm px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 dark:text-white transition"
+      onClick={() => setIsDark(!isDark)}
+      className="text-2xl focus:outline-none"
+      title="Toggle Dark Mode"
     >
-      {dark ? "☀️" : "🌙"}
+      {isDark ? "🌞" : "🌙"}
     </button>
   );
 }

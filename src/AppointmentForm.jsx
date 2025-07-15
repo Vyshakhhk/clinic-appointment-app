@@ -55,7 +55,7 @@ const AppointmentForm = ({ onSave, selectedDate, editData, onCancelEdit }) => {
         <select
           value={patient}
           onChange={(e) => setPatient(e.target.value)}
-          className="w-full p-2 rounded bg-white text-black"
+          className="w-full px-3 py-2 rounded-md bg-white text-black brder border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea] transition"
         >
           {patients.map((p, idx) => (
             <option key={idx} value={p}>
@@ -70,7 +70,7 @@ const AppointmentForm = ({ onSave, selectedDate, editData, onCancelEdit }) => {
         <select
           value={doctor}
           onChange={(e) => setDoctor(e.target.value)}
-          className="w-full p-2 rounded bg-white text-black"
+          className="w-full px-3 py-2 rounded-md bg-white text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea] transition"
         >
           {doctors.map((d, idx) => (
             <option key={idx} value={d}>
@@ -86,14 +86,14 @@ const AppointmentForm = ({ onSave, selectedDate, editData, onCancelEdit }) => {
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="w-full p-2 rounded bg-white text-black"
+          className="w-full px-3 py-2 rounded-md bg-white text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#9333ea] focus:border-[#9333ea] transition"
         />
       </div>
 
       <div className="flex gap-2">
         <button
           type="submit"
-          className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded"
+          className="flex-1 bg-[#9333ea] hover:bg-[#7e22ce] text-white font-semibold py-2 rounded-lg shadow-md transition duration-200"
         >
           {editData ? "Update" : "Save"} Appointment
         </button>

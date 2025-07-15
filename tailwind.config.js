@@ -18,4 +18,16 @@ module.exports = {
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
+  safelist: [
+    // Today's highlight classes
+    'bg-purple-100',
+    'border-2',
+    'border-purple-500',
+    'text-purple-700',
+    'rounded-lg',
+    'font-semibold',
+    // Selected day classes
+    'bg-purple-600',
+    'text-white',
+  ],
 };

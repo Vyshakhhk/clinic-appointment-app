@@ -30,7 +30,7 @@ function LoginForm({ onLogin }) {
   }}
 >
 
-      <div className="relative w-[90%] sm:w-[400px] md:w-[500px] h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/30">
+      <div className="relative w-[85%] sm:w-[400px] md:w-[500px] h-[348px] md:h-[400px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/30">
         <input
           type="checkbox"
           id="chk"
@@ -65,7 +65,7 @@ function LoginForm({ onLogin }) {
             />
             <button
               type="button"
-              className="btn-style bg-purple-600 hover:bg-purple-700 text-white"
+              className="btn-style bg-purple-400 hover:bg-purple-700 text-white"
             >
               Sign Up
             </button>
@@ -84,7 +84,7 @@ function LoginForm({ onLogin }) {
           >
             <label
               htmlFor="chk"
-              className="text-2xl text-white font-semibold mb-6 cursor-pointer tracking-wide"
+              className="text-2xl font-semibold tracking-wide mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[#3d3462] via-[#cabfff] via-[#b69eff] via-[#cabfff] to-[#5c4d91]"
             >
               Clinic Staff Login
             </label>
@@ -104,7 +104,7 @@ function LoginForm({ onLogin }) {
             />
             <button
               type="submit"
-              className="btn-style bg-purple-600 hover:bg-purple-700 text-white"
+              className="btn-style text-white bg-gradient-to-r from-[#3d3462] via-[#cabfff] via-[#cabfff] via-[#a88fff] via-[#b69eff] to-[#3d3462] hover:from-[#cabfff] hover:to-[#9674ff] transition duration-300"
             >
               Login
             </button>

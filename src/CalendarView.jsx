@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
@@ -6,7 +5,6 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import { AnimatePresence, motion } from "framer-motion";
 import AppointmentForm from "./AppointmentForm";
 import toast from "react-hot-toast";
-
 
 dayjs.extend(weekday);
 dayjs.extend(isoWeek);
@@ -64,7 +62,8 @@ function CalendarView() {
   };
 
   const calendarDates = generateCalendar();
-    const handleSaveAppointment = (appointment) => {
+
+  const handleSaveAppointment = (appointment) => {
     const key = appointment.date
       ? appointment.date
       : dayjs(days[currentDayIndex]).format("YYYY-MM-DD");
@@ -88,18 +87,16 @@ function CalendarView() {
   };
 
   const handleDeleteAppointment = (index, date) => {
-  const updated = [...(appointmentsByDay[date] || [])];
-  updated.splice(index, 1);
+    const updated = [...(appointmentsByDay[date] || [])];
+    updated.splice(index, 1);
 
-  setAppointmentsByDay((prev) => ({
-    ...prev,
-    [date]: updated,
-  }));
+    setAppointmentsByDay((prev) => ({
+      ...prev,
+      [date]: updated,
+    }));
 
-  toast.success("Appointment deleted!");
+    toast.success("Appointment deleted!");
   };
-
-
 
   const handleEditAppointment = (index, date) => {
     const appt = appointmentsByDay[date][index];
@@ -111,7 +108,8 @@ function CalendarView() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-slate-100 to-white p-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#e3d6ff] via-[#d4bfff] to-[#cbbaff] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-6 font-[Jost] text-black dark:text-white">
+
       {isMobile ? (
         <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 text-center space-y-6">
           <input
@@ -128,7 +126,7 @@ function CalendarView() {
                 setCurrentDayIndex(updatedDays.length - 1);
               }
             }}
-            className="w-full max-w-xs mb-2 p-2 rounded-md bg-white text-black shadow"
+            className="w-full max-w-xs mb-2 p-2 rounded-md bg-white text-black shadow dark:bg-slate-700 dark:text-white"
           />
 
           <AnimatePresence mode="wait">
@@ -153,13 +151,13 @@ function CalendarView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
               transition={{ duration: 0.4 }}
-              className="bg-blue-100 w-full max-w-xs p-6 rounded shadow h-[60vh] flex flex-col justify-center cursor-grab"
+              className="bg-[#5c4d90]/40 text-[#43336b]  backdrop-blur-sm w-full max-w-xs p-6 rounded-2xl shadow-xl shadow-purple-900 shadow-purple-200 h-[60vh] flex flex-col justify-center cursor-grab transition-all duration-300 hover:scale-[1.03]"
             >
               <p
                 className={`text-xl font-bold ${
                   days[currentDayIndex] === dayjs().format("MMMM D, YYYY")
-                    ? "text-green-700"
-                    : "text-slate-800"
+                    ? "text-purple-900 dark:text-purple-500"
+                    : "text-slate-800 dark:text-white"
                 }`}
               >
                 {days[currentDayIndex]}
@@ -167,15 +165,15 @@ function CalendarView() {
 
               <div className="mt-4 space-y-2 text-left text-sm overflow-y-auto max-h-40 pr-1 scrollbar-hide">
                 {(appointmentsByDay[dayjs(days[currentDayIndex]).format("YYYY-MM-DD")] || []).map((appt, idx) => (
-                  <div key={idx} className="bg-white rounded p-2 shadow-sm border flex justify-between items-start gap-2">
+                  <div key={idx} className="bg-white dark:bg-slate-700 rounded p-2 shadow-sm border flex justify-between items-start gap-2">
                     <div>
-                      <p className="font-medium">{appt.time}</p>
-                      <p className="text-slate-600">Patient: {appt.patient}</p>
-                      <p className="text-slate-600">Doctor: {appt.doctor}</p>
+                      <p className="font-medium text-black dark:text-white">{appt.time}</p>
+                      <p className="text-slate-600 dark:text-slate-300">Patient: {appt.patient}</p>
+                      <p className="text-slate-600 dark:text-slate-300">Doctor: {appt.doctor}</p>
                     </div>
                     <div className="space-x-1">
-                      <button onClick={() => handleEditAppointment(idx, dayjs(days[currentDayIndex]).format("YYYY-MM-DD"))} className="text-blue-500">✏️</button>
-                      <button onClick={() => handleDeleteAppointment(idx, dayjs(days[currentDayIndex]).format("YYYY-MM-DD"))} className="text-red-500">🗑️</button>
+                      <button onClick={() => handleEditAppointment(idx, dayjs(days[currentDayIndex]).format("YYYY-MM-DD"))} className="text-blue-500 dark:text-blue-300">✏️</button>
+                      <button onClick={() => handleDeleteAppointment(idx, dayjs(days[currentDayIndex]).format("YYYY-MM-DD"))} className="text-red-500 dark:text-red-300">🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -191,7 +189,7 @@ function CalendarView() {
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
               <div
                 key={day}
-                className="text-center text-slate-500 font-semibold uppercase tracking-wider"
+                className="text-center text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider"
               >
                 {day}
               </div>
@@ -204,31 +202,52 @@ function CalendarView() {
 
               return (
                 <motion.div
-                    key={idx}
-                    onClick={() => {
-                      setSelectedDate(formatted);
-                      setShowModal(true);
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    layout
-                    className={`rounded-xl p-2 border shadow-sm bg-white/70 hover:bg-blue-100/70 backdrop-blur-sm cursor-pointer transition-all
-                      ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
-                      ${isToday ? "border-blue-500" : "border-slate-200"} h-36 flex flex-col justify-between`}
-                  >
+                  key={idx}
+                  onClick={() => {
+                    setSelectedDate(formatted);
+                    setShowModal(true);
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  layout
+                  className={`rounded-xl p-2 border shadow-sm backdrop-blur-sm cursor-pointer transition-all
+                    ${!isCurrentMonth ? "opacity-40 pointer-events-none" : ""}
+                    ${isToday
+                      ? "bg-[#e3d6ff]/80 md-bg-[#aa95ff]/40 dark:bg-[#5c4d91]/50 text-[#5a4e84] dark:text-[#e8ddff] border border-[#5c4d91] dark:border-[#aa95ff] backdrop-blur-sm"
 
-                
-                  <div className="text-sm font-semibold text-slate-800 mb-1 text-right">
+                      : "bg-white/70 hover:bg-blue-100/70 dark:bg-slate-800 hover:dark:bg-slate-700 text-slate-800 dark:text-white border-slate-200 dark:border-slate-600"}
+                       h-36 flex flex-col justify-between`}
+                >
+                  <div className="text-sm font-semibold mb-1 text-right text-black dark:text-white">
                     {date.date()}
                   </div>
 
                   <div className="space-y-1 overflow-y-auto pr-1 scrollbar-hide text-xs">
                     {(appointmentsByDay[formatted] || []).map((appt, i) => (
-                      <div key={i} className="bg-blue-500 text-white px-2 py-1 rounded flex justify-between items-center gap-1">
+                      <div
+                        key={i}
+                        className="bg-violet-500 text-white px-2 py-1 rounded flex justify-between items-center gap-1"
+                      >
                         <span>{appt.time} – {appt.patient}</span>
                         <span>
-                          <button onClick={(e) => { e.stopPropagation(); handleEditAppointment(i, formatted); }} className="text-xs">✏️</button>
-                          <button onClick={(e) => { e.stopPropagation(); handleDeleteAppointment(i, formatted); }} className="text-xs ml-1">🗑️</button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditAppointment(i, formatted);
+                            }}
+                            className="text-xs"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteAppointment(i, formatted);
+                            }}
+                            className="text-xs ml-1"
+                          >
+                            🗑️
+                          </button>
                         </span>
                       </div>
                     ))}
@@ -238,8 +257,8 @@ function CalendarView() {
             })}
           </div>
 
-         <AnimatePresence>
-          {showModal && selectedDate && (
+          <AnimatePresence>
+            {showModal && selectedDate && (
               <motion.div
                 className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
                 initial={{ opacity: 0 }}
@@ -247,7 +266,7 @@ function CalendarView() {
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-white text-black p-6 rounded-xl w-full max-w-md shadow-lg relative"
+                  className="bg-white dark:bg-slate-800 text-black dark:text-white p-6 rounded-xl w-full max-w-md shadow-lg relative"
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
@@ -258,7 +277,7 @@ function CalendarView() {
                       setShowModal(false);
                       setEditData(null);
                     }}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
+                    className="absolute top-2 right-2 text-gray-500 hover:text-black dark:hover:text-white text-xl font-bold"
                   >
                     ×
                   </button>
@@ -275,7 +294,6 @@ function CalendarView() {
               </motion.div>
             )}
           </AnimatePresence>
-
         </>
       )}
     </div>

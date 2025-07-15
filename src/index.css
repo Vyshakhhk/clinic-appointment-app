@@ -1,7 +1,70 @@
+
+.react-calendar {
+  filter: invert(0) !important;
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
   font-family: 'Poppins', sans-serif;
+}
+
+/* Dark mode calendar tile styles */
+.calendar-wrapper .react-calendar {
+  background-color: transparent;
+  border: none;
+}
+
+.calendar-wrapper .react-calendar__month-view__days {
+  gap: 4px;
+}
+
+.calendar-wrapper .react-calendar__tile {
+  background-color: white;
+  color: #1f2937; /* text-gray-900 */
+  padding: 8px;
+  border-radius: 0.5rem;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-wrapper .react-calendar__tile:hover {
+  background-color: #e5e7eb; /* hover:bg-gray-200 */
+}
+
+.dark .calendar-wrapper .react-calendar__tile {
+  background-color: #0f0f0f;
+  color: white;
+}
+
+.dark .calendar-wrapper .react-calendar__tile:hover {
+  background-color: #374151; /* hover:bg-gray-700 */
+}
+
+.calendar-wrapper .react-calendar__tile--now {
+  border: 2px solid #9333ea;
+  font-weight: 600;
+}
+
+.calendar-wrapper .react-calendar__tile--active {
+  background-color: #9333ea;
+  color: white;
+  font-weight: 600;
+}
+/* Force date numbers to be visible in dark mode */
+.dark .react-calendar__tile abbr {
+  color: black !important;
+}
+
+/* 📌 FORCE black text in dark mode for calendar tiles */
+.dark .react-calendar__tile,
+.dark .react-calendar__tile abbr,
+.dark .react-calendar__month-view,
+.dark .react-calendar,
+.dark .react-calendar * {
+  color: #000 !important;
+  background-color: transparent !important;
 }
