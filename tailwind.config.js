@@ -1,6 +1,6 @@
 // tailwind.config.js
 module.exports = {
-  darkMode: 'class', //  Important for toggle to work
+  darkMode: 'class', // Important for toggle to work
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -9,6 +9,11 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ["Poppins", "sans-serif"], // optional
+      },
+      width: {
+        '90p': '90%',
+        '400px': '400px',
+        '500px': '500px',
       },
     },
   },

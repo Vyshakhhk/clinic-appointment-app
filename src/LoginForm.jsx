@@ -30,7 +30,7 @@ function LoginForm({ onLogin }) {
   }}
 >
 
-      <div className="relative w-full max-w-md h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/20">
+      <div className="relative w-[90%] sm:w-[400px] md:w-[500px] h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/30">
         <input
           type="checkbox"
           id="chk"
