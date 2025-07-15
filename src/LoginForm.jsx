@@ -1,3 +1,4 @@
+import { radialGradient } from "framer-motion/client";
 import { useState } from "react";
 
 function LoginForm({ onLogin }) {
@@ -15,7 +16,12 @@ function LoginForm({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] font-[Jost] px-4">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat font-[Jost] px-4"
+      style={{
+        backgroundImage:  "url('/images/clinic-login-bg.jpg')",
+      }}
+    >
       <div className="relative w-full max-w-md h-[500px] bg-white/10 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/20">
         <input
           type="checkbox"
