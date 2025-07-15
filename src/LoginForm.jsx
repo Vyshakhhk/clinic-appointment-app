@@ -17,7 +17,7 @@ function LoginForm({ onLogin }) {
 
   return (
     <div
-      className="min-h-[100dvh] flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat font-[Jost] px-4"
+      className="min-h-[100dvh] w-full flex items-center justify-center font-[Jost] px-4 bg-no-repeat bg-center bg-contain md:bg-cover"
       style={{
         backgroundImage:  "url('/images/clinic-login-bg.webp')",
         backgroundSize: "cover",
