@@ -21,7 +21,7 @@ function LoginForm({ onLogin }) {
     className="w-screen h-screen flex items-center justify-center font-[Jost] px-4 py-8"
     style={{
     backgroundImage: `url(${window.innerWidth < 768 
-    ? '/images/clinic-login-bg-mobile.webp' 
+    ? '/images/clinic-login-phone-bg.webp' 
     : '/images/clinic-login-bg.webp'})`,
     backgroundSize: "cover",
     backgroundPosition: "center",
