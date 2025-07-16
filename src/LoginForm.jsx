@@ -79,7 +79,7 @@ function LoginForm({ onLogin }) {
           } z-20`}
         >
           <form
-            className="h-full flex flex-col items-center justify-center px-8"
+            className="h-full flex flex-col items-center justify-center px-8 "
             onSubmit={handleLogin}
           >
             <label

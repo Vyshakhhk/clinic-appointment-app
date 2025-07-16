@@ -24,7 +24,7 @@ function DarkModeToggle() {
       className="text-2xl focus:outline-none"
       title="Toggle Dark Mode"
     >
-      {isDark ? "🌞" : "🌙"}
+      {isDark ? "☀️" : "🌔"}
     </button>
   );
 }
