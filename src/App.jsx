@@ -20,9 +20,13 @@ function App() {
           >
             <nav className="w-full backdrop-blur-sm bg-white/50 dark:bg-white/10 border-b border-gray-200 dark:border-white/30 shadow-md px-4 py-3 flex items-center justify-between sticky top-0 z-50">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-[#9333ea] to-[#7e22ce] rounded-full flex items-center justify-center text-white shadow-md text-xl font-bold">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xl font-bold
+                  bg-gradient-to-br from-[#e0cfff] to-[#cabfff]
+                  shadow-[inset_0_1px_2px_#ffffff80,0_4px_10px_#cabfff80]
+                  ring-1 ring-white/40 backdrop-blur-sm">
                   ✚
                 </div>
+
                 <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
                   Clinic Calendar
                 </h1>
@@ -31,7 +35,7 @@ function App() {
                 <DarkModeToggle />
                 <button
                   onClick={() => setIsLoggedIn(false)}
-                  className="bg-[#9333ea] hover:bg-[#7e22ce] text-white px-4 py-2 rounded-lg font-semibold shadow-md transition duration-200"
+                  className="bg-[#e0cfff] hover:bg-[#d4bfff] text-white px-4 py-2 rounded-lg font-semibold shadow-md transition duration-200"
                 >
                   Logout
                 </button>

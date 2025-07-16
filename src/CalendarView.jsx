@@ -151,7 +151,7 @@ function CalendarView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
               transition={{ duration: 0.4 }}
-              className="bg-[#5c4d90]/40 text-[#43336b]  backdrop-blur-sm w-full max-w-xs p-6 rounded-2xl shadow-xl shadow-purple-900 shadow-purple-200 h-[60vh] flex flex-col justify-center cursor-grab transition-all duration-300 hover:scale-[1.03]"
+              className="bg-[#f3e8ff	]/40 text-[#43336b]  backdrop-blur-sm w-full max-w-xs p-6 rounded-2xl shadow-xl shadow-purple-900 shadow-purple-200 h-[60vh] flex flex-col justify-center cursor-grab transition-all duration-300 hover:scale-[1.03]"
             >
               <p
                 className={`text-xl font-bold ${
