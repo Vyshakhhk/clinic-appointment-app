@@ -84,7 +84,7 @@ function LoginForm({ onLogin }) {
           >
             <label
               htmlFor="chk"
-              className="text-2xl font-semibold tracking-wide mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[#3d3462] via-[#cabfff] via-[#b69eff] via-[#cabfff] to-[#5c4d91]"
+              className="text-2xl font-semibold tracking-wide mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[#3d3462] via-[#3d3462] via-[#3d3462] via-[#5c4d91] to-[#5c4d91]"
             >
               Clinic Staff Login
             </label>
